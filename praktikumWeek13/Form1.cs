@@ -30,39 +30,32 @@ namespace praktikumWeek13
         int PosisiSekarang = 0;
         private void Form1_Load(object sender, EventArgs e)
         {
-            sqlQuery = "SELECT p.player_id,p.player_name,p.birthdate,n.nation,t.team_name,p.team_number FROM player_vanessa p,team t, nationality n where p.team_id = t.team_id and p.nationality_id = n.nationality_id;";
+            sqlQuery = "SELECT p.player_id,p.player_name,p.birthdate,p.nationality_id,p.team_id,p.team_number FROM player_vanessa p";
             sqlCommand = new MySqlCommand(sqlQuery, sqlConnect);
             sqlAdapter = new MySqlDataAdapter(sqlCommand);
             sqlAdapter.Fill(dtTypePemain);
             
-            sqlQuery = "SELECT n.nation FROM player_vanessa p,nationality n where  p.nationality_id = n.nationality_id group by 1 ;";
+            sqlQuery = "SELECT n.nation as `Nation`, nationality_id as `Nationality ID` FROM nationality n ";
             sqlCommand = new MySqlCommand(sqlQuery, sqlConnect);
             sqlAdapter = new MySqlDataAdapter(sqlCommand);
             sqlAdapter.Fill(dtTypePemain2);
-            IsiComboBox(0);
+            cBoxNation.DataSource = dtTypePemain2;
+            cBoxNation.DisplayMember = "Nation";
+            cBoxNation.ValueMember = "nationality Id";
+
+
             sqlQuery = "SELECT team_name, team_id FROM team;";
             sqlCommand = new MySqlCommand(sqlQuery, sqlConnect);
             sqlAdapter = new MySqlDataAdapter(sqlCommand);
             sqlAdapter.Fill(dtTypePemain3);
-            IsiComboBox2(0);
-
-            sqlQuery = "select p.player_id as id_lama, p.player_id, p.player_name, p.birthdate, n.nation, t.team_name, p.team_number from player_vanessa p, nationality n, team t where n.nationality_id = p.nationality_id and t.team_id = p.team_id group by 1; ";
-            sqlCommand = new MySqlCommand(sqlQuery, sqlConnect);
-            sqlAdapter = new MySqlDataAdapter(sqlCommand);
-            sqlAdapter.Fill(dtTeamSave);
-            
 
             cBoxTeam.DataSource = dtTypePemain3;
             cBoxTeam.DisplayMember = "team_name";
             cBoxTeam.ValueMember = "team_id";
 
-            tBoxID.Text = IDbefore;
-            tBoxName.Text = NameBefore;
-            BirthDate.Text = BirthDateBefore;
-            cBoxNation.Text = NationBefore;
-            cBoxTeam.Text = TeamBefore;
-            numTeamNumb.Text = TeamNumberBefore;
             IsiDataPemain(0);
+
+            
 
         }
         string IDbefore;
@@ -74,30 +67,26 @@ namespace praktikumWeek13
 
         public void IsiDataPemain(int Posisi)
         {
-            tBoxID.Text = dtTypePemain.Rows[Posisi][0].ToString();
-            tBoxName.Text = dtTypePemain.Rows[Posisi][1].ToString();
-            BirthDate.Text = dtTypePemain.Rows[Posisi][2].ToString();
-            cBoxNation.Text = dtTypePemain.Rows[Posisi][3].ToString();
-            cBoxTeam.Text = dtTypePemain.Rows[Posisi][4].ToString();
-            numTeamNumb.Text = dtTypePemain.Rows[Posisi][5].ToString();
-            PosisiSekarang = Posisi;
-        }
-        public void IsiComboBox(int Posisi2)
-        {
-            this.cBoxNation.DataSource = dtTypePemain2;
-            cBoxNation.ValueMember = "nation";
-            cBoxNation.Text = dtTypePemain2.Rows[Posisi2][0].ToString();
-            PosisiSekarang = Posisi2;
+            try
+            {
+                tBoxID.Text = dtTypePemain.Rows[Posisi][0].ToString();
+                tBoxName.Text = dtTypePemain.Rows[Posisi][1].ToString();
+                BirthDate.Text = dtTypePemain.Rows[Posisi][2].ToString();
+                
+                cBoxNation.SelectedValue = dtTypePemain.Rows[Posisi][3].ToString();
+                cBoxTeam.SelectedValue = dtTypePemain.Rows[Posisi][4].ToString();
+                numTeamNumb.Text = dtTypePemain.Rows[Posisi][5].ToString();
+
+                PosisiSekarang = Posisi;
+            }
+            catch (Exception)
+            {
+
+                
+            }
             
         }
-        public void IsiComboBox2(int Posisi3)
-        {
-            this.cBoxTeam.DataSource = dtTypePemain3;
-            cBoxTeam.ValueMember = "team_name";
-            cBoxTeam.Text = dtTypePemain3.Rows[Posisi3][0].ToString();
-            PosisiSekarang = Posisi3;
-
-        }
+       
 
         private void btnFirst_Click(object sender, EventArgs e)
         {
@@ -147,7 +136,7 @@ namespace praktikumWeek13
 
         private void cBoxTeam_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            TeamNumber();
         }
         private void TeamNumber()
         {
@@ -174,9 +163,11 @@ namespace praktikumWeek13
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            
             if (lavailable.Text == "Available")
             {
-                sqlQuery = $"UPDATE player SET player_name = '" + tBoxName.Text + "', team_number = '" + numTeamNumb.Value.ToString() + "', nationality_id = '" + cBoxNation.SelectedValue.ToString() + "', team_id = '" + cBoxTeam.SelectedValue.ToString() + "' where player_id = '" + tBoxID.Text + "' ";
+               
+                sqlQuery = $"UPDATE player_vanessa SET player_name = '" + tBoxName.Text + "', team_number = '" + numTeamNumb.Value.ToString() + "', nationality_id = '" + cBoxNation.SelectedValue.ToString() + "', team_id = '" + cBoxTeam.SelectedValue.ToString() + "' where player_id = '" + tBoxID.Text + "' ";
                 sqlConnect.Open();
                 sqlCommand = new MySqlCommand(sqlQuery, sqlConnect);
                 sqlCommand.ExecuteNonQuery();
